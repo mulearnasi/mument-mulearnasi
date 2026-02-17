@@ -1,8 +1,56 @@
 "use client";
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import * as Tabs from '@radix-ui/react-tabs';
 import { MessageSquare, Send, Filter, CheckCircle2 } from 'lucide-react';
+
+// Floating Particles Component
+const FloatingParticles = ({ variant = 'light' }) => {
+  const [mounted, setMounted] = useState(false);
+  const [particleData] = useState(() => {
+    const count = variant === 'splash' ? 30 : 50;
+    return Array.from({ length: count }, () => ({
+      size: Math.random() * 20 + 5,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      opacity: Math.random() * 0.3 + 0.1,
+      duration: Math.random() * 10 + 10,
+      delay: Math.random() * 5,
+    }));
+  });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+  
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {particleData.map((particle, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: particle.size + 'px',
+            height: particle.size + 'px',
+            left: particle.left + '%',
+            top: particle.top + '%',
+            background: variant === 'splash' 
+              ? `radial-gradient(circle, rgba(255,255,255,${particle.opacity}) 0%, transparent 70%)`
+              : `radial-gradient(circle, rgba(37, 99, 235, ${particle.opacity}) 0%, transparent 70%)`,
+            animation: `float ${particle.duration}s linear infinite`,
+            animationDelay: `${particle.delay}s`,
+            boxShadow: variant === 'splash' 
+              ? '0 0 20px rgba(255,255,255,0.3)'
+              : '0 0 20px rgba(37, 99, 235, 0.2)',
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 // --- Official µLearn SVG Component with precise ASI and Mument 2.0 alignment ---
 const ULearnLogo = ({ isLarge = false }) => (
@@ -53,8 +101,8 @@ export default function MuLearnQueryHub() {
   const [doubts, setDoubts] = useState<any[]>([]);
   const [filter, setFilter] = useState('All Topics');
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('view');
-  const [newDoubt, setNewDoubt] = useState({ topic: 'Figma', question: '' });
+  const [activeTab, setActiveTab] = useState('post');
+  const [newDoubt, setNewDoubt] = useState({ topic: '', question: '' });
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500);
@@ -85,24 +133,79 @@ export default function MuLearnQueryHub() {
 
   if (showSplash) {
     return (
-      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#f8f7ff]">
-        <div className="animate-in fade-in zoom-in duration-1000 transform scale-110 flex flex-col items-center">
-          <ULearnLogo isLarge={true} />
+      <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-gradient-to-br from-[#2563eb] via-[#3b82f6] to-[#60a5fa] overflow-hidden">
+        <FloatingParticles variant="splash" />
+        
+        {/* Animated Rings */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute w-[300px] h-[300px] border-4 border-white/20 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute w-[400px] h-[400px] border-4 border-white/10 rounded-full animate-ping" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}></div>
+          <div className="absolute w-[500px] h-[500px] border-4 border-white/5 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
         </div>
-        <div className="mt-16 flex space-x-3">
-          <div className="w-2.5 h-2.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-          <div className="w-2.5 h-2.5 bg-purple-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-          <div className="w-2.5 h-2.5 bg-pink-500 rounded-full animate-bounce"></div>
+
+        {/* Glowing orbs */}
+        <div className="absolute top-20 left-20 w-32 h-32 bg-cyan-400/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-blue-300/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 right-32 w-24 h-24 bg-purple-400/20 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        
+        <div className="animate-in fade-in zoom-in duration-1000 flex flex-col items-center relative z-10">
+          <div className="relative">
+            {/* Glow effect behind logo */}
+            <div className="absolute inset-0 bg-white/40 blur-3xl scale-150 animate-pulse-slow"></div>
+            
+            <div className="relative animate-in zoom-in duration-1000">
+              <Image 
+                src="/mument_logo.png" 
+                alt="Mument Logo" 
+                width={380}
+                height={380}
+                className="h-auto mb-6 drop-shadow-2xl animate-float"
+                priority
+              />
+            </div>
+          </div>
+          <span className="font-black text-white tracking-[0.2em] uppercase text-3xl drop-shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 [text-shadow:_0_0_30px_rgb(255_255_255_/_50%)]">
+            µLearn ASI
+          </span>
+          <div className="h-1 w-32 bg-gradient-to-r from-transparent via-white to-transparent mt-4 animate-in fade-in duration-1000 delay-500"></div>
+        </div>
+        
+        <div className="mt-20 flex space-x-4 relative z-10">
+          <div className="w-4 h-4 bg-white rounded-full animate-bounce [animation-delay:-0.3s] shadow-2xl shadow-white/50"></div>
+          <div className="w-4 h-4 bg-white/90 rounded-full animate-bounce [animation-delay:-0.15s] shadow-2xl shadow-white/50"></div>
+          <div className="w-4 h-4 bg-white/80 rounded-full animate-bounce shadow-2xl shadow-white/50"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f7ff] text-[#1a1a1a] font-sans selection:bg-purple-200">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 text-gray-900 font-sans selection:bg-blue-200 relative overflow-hidden">
+      <FloatingParticles variant="light" />
+      
+      {/* Animated Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -left-24 w-[500px] h-[500px] bg-purple-200/40 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-indigo-100/40 rounded-full blur-[100px]" />
+        <div className="absolute -top-24 -left-24 w-[500px] h-[500px] bg-blue-400/10 rounded-full blur-[120px] animate-pulse-slow" />
+        <div className="absolute top-1/2 -right-24 w-[400px] h-[400px] bg-cyan-400/10 rounded-full blur-[100px] animate-pulse-slow [animation-delay:2s]" />
+        <div className="absolute bottom-0 left-1/3 w-[350px] h-[350px] bg-blue-300/10 rounded-full blur-[100px] animate-pulse-slow [animation-delay:4s]" />
+        <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-purple-400/5 rounded-full blur-[100px] animate-pulse-slow [animation-delay:6s]" />
+        <div className="absolute bottom-1/4 left-1/4 w-[280px] h-[280px] bg-indigo-400/8 rounded-full blur-[100px] animate-pulse-slow [animation-delay:3s]" />
+      </div>
+      
+      {/* Decorative animated shapes */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-2 h-2 bg-blue-400/40 rounded-full animate-ping" style={{ animationDuration: '4s' }}></div>
+        <div className="absolute top-40 right-20 w-3 h-3 bg-cyan-400/40 rounded-full animate-ping" style={{ animationDuration: '5s', animationDelay: '1s' }}></div>
+        <div className="absolute bottom-32 left-24 w-2 h-2 bg-blue-500/40 rounded-full animate-ping" style={{ animationDuration: '4.5s', animationDelay: '2s' }}></div>
+        <div className="absolute bottom-1/3 right-16 w-3 h-3 bg-indigo-400/40 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '0.5s' }}></div>
+        <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-purple-400/30 rounded-full animate-ping" style={{ animationDuration: '5s', animationDelay: '1.5s' }}></div>
+        <div className="absolute top-2/3 right-1/3 w-2 h-2 bg-blue-300/40 rounded-full animate-ping" style={{ animationDuration: '4.5s', animationDelay: '2.5s' }}></div>
+        
+        {/* Floating geometric shapes */}
+        <div className="absolute top-1/4 left-[15%] w-16 h-16 border-2 border-blue-300/20 rounded-lg rotate-45 animate-float" style={{ animationDuration: '6s' }}></div>
+        <div className="absolute bottom-1/4 right-[20%] w-20 h-20 border-2 border-cyan-300/20 rounded-full animate-float" style={{ animationDuration: '8s', animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 right-[10%] w-12 h-12 border-2 border-indigo-300/20 rotate-12 animate-float" style={{ animationDuration: '7s', animationDelay: '2s' }}></div>
+        <div className="absolute bottom-1/3 left-[25%] w-14 h-14 border-2 border-blue-400/20 rounded-full animate-float" style={{ animationDuration: '9s', animationDelay: '0.5s' }}></div>
       </div>
 
       <div className="relative max-w-3xl mx-auto px-4 py-8 md:py-16">
@@ -110,69 +213,113 @@ export default function MuLearnQueryHub() {
           <ULearnLogo />
         </nav>
 
-        <header className="mb-12 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-[11px] font-black tracking-[0.2em] text-purple-600 uppercase bg-white border border-purple-100 rounded-full shadow-sm">
+        <header className="mb-12 text-center animate-in fade-in slide-in-from-top-5 duration-700 relative">
+          {/* Decorative elements around header */}
+          <div className="absolute -top-8 left-1/4 w-3 h-3 bg-blue-400/40 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute -top-4 right-1/3 w-2 h-2 bg-cyan-400/40 rounded-full animate-ping" style={{ animationDuration: '4s', animationDelay: '1s' }}></div>
+          <div className="absolute top-4 left-[15%] w-8 h-8 border border-blue-300/20 rounded-full animate-float" style={{ animationDuration: '5s' }}></div>
+          <div className="absolute top-8 right-[18%] w-6 h-6 border border-indigo-300/20 rotate-45 animate-float" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
+          
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-[11px] font-black tracking-[0.2em] text-blue-600 uppercase bg-white/80 backdrop-blur-sm border border-blue-200 rounded-full shadow-md">
             µLearn ASI 
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-[#2d1b69] tracking-tight mb-4 leading-tight">
-            Query <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Hub</span>
+          <h1 className="text-5xl md:text-6xl font-black text-[#2563eb] tracking-tight mb-4 leading-tight">
+            Query <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-cyan-500">Hub</span>
           </h1>
-          <p className="text-gray-500 font-medium text-lg italic">Learn Faster — Ask Here.</p>
+          <p className="text-blue-600 font-medium text-lg italic">where curiosity meets action</p>
         </header>
 
         <Tabs.Root value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <Tabs.List className="flex p-1.5 mb-10 bg-white/60 backdrop-blur-md rounded-2xl border border-white shadow-sm max-w-xs mx-auto">
-            <Tabs.Trigger value="post" className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all ${activeTab === 'post' ? 'bg-[#2d1b69] text-white shadow-lg' : 'text-gray-500 hover:bg-purple-50'}`}>
+          <Tabs.List className="flex p-1.5 mb-10 bg-white/70 backdrop-blur-md rounded-2xl border border-blue-200 shadow-lg max-w-xs mx-auto animate-in fade-in zoom-in duration-500 delay-300">
+            <Tabs.Trigger value="post" className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'post' ? 'bg-[#2563eb]/90 text-white shadow-md scale-105' : 'text-blue-600 hover:bg-blue-50/50'}`}>
               <Send size={16} /> Ask
             </Tabs.Trigger>
-            <Tabs.Trigger value="view" className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all ${activeTab === 'view' ? 'bg-[#2d1b69] text-white shadow-lg' : 'text-gray-500 hover:bg-purple-50'}`}>
+            <Tabs.Trigger value="view" className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'view' ? 'bg-[#2563eb]/90 text-white shadow-md scale-105' : 'text-blue-600 hover:bg-blue-50/50'}`}>
               <MessageSquare size={16} /> Explore
             </Tabs.Trigger>
           </Tabs.List>
 
           <Tabs.Content value="post" className="outline-none animate-in fade-in slide-in-from-bottom-5 duration-500">
-            <div className="bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl shadow-purple-100/50 border border-white relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500" />
+            <div className="bg-white/70 backdrop-blur-lg p-6 md:p-10 rounded-[2.5rem] shadow-xl shadow-blue-500/10 border border-blue-200/50 relative overflow-hidden hover:shadow-blue-500/20 transition-shadow duration-300">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-400/70 via-blue-500/70 to-blue-600/70 animate-gradient-x" />
+              
+              {/* Decorative corner elements */}
+              <div className="absolute top-4 right-4 w-20 h-20 border-2 border-blue-200/30 rounded-full animate-ping" style={{ animationDuration: '4s' }}></div>
+              <div className="absolute bottom-4 left-4 w-16 h-16 border-2 border-cyan-200/30 rounded-lg rotate-45 animate-pulse-slow"></div>
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Topic</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest ml-1">Select Domain</label>
+                  <select 
+                    value={newDoubt.topic} 
+                    onChange={(e) => setNewDoubt({...newDoubt, topic: e.target.value})}
+                    className="w-full p-4 bg-blue-50/50 border-2 border-blue-200/60 rounded-xl text-sm font-bold transition-all focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 outline-none text-blue-900 hover:border-blue-300"
+                    required
+                  >
+                    <option value="" disabled>Choose a domain...</option>
                     {TOPICS.filter(t => t !== 'All Topics').map(t => (
-                      <button key={t} type="button" onClick={() => setNewDoubt({...newDoubt, topic: t})} className={`py-3 px-2 rounded-xl text-[11px] font-bold transition-all border-2 ${newDoubt.topic === t ? 'bg-indigo-50 border-indigo-500 text-indigo-700' : 'bg-gray-50 border-transparent text-gray-400 hover:bg-gray-100'}`}>{t}</button>
+                      <option key={t} value={t}>{t}</option>
                     ))}
-                  </div>
+                  </select>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Your Question</label>
-                  <textarea className="w-full p-6 bg-gray-50 border-none rounded-[1.5rem] h-44 focus:ring-2 focus:ring-purple-400 transition-all outline-none text-gray-700 leading-relaxed" placeholder="Post your query anonymously..." value={newDoubt.question} onChange={(e) => setNewDoubt({...newDoubt, question: e.target.value})} required />
+                  <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest ml-1">Your Question</label>
+                  <textarea 
+                    className="w-full p-6 bg-blue-50/50 border-2 border-blue-100/60 rounded-[1.5rem] h-44 focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 transition-all outline-none text-blue-900 leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed hover:border-blue-300" 
+                    placeholder={newDoubt.topic ? "Post your query anonymously..." : "Please select a domain first..."} 
+                    value={newDoubt.question} 
+                    onChange={(e) => setNewDoubt({...newDoubt, question: e.target.value})} 
+                    disabled={!newDoubt.topic}
+                    required 
+                  />
                 </div>
-                <button disabled={loading} className="w-full py-5 bg-[#2d1b69] text-white rounded-2xl font-black text-lg hover:shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50 tracking-tight">{loading ? 'Submitting...' : 'Submit Post'}</button>
+                <button disabled={loading || !newDoubt.topic} className="w-full py-5 bg-[#2563eb]/90 text-white rounded-2xl font-black text-lg hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:hover:scale-100 tracking-tight">{loading ? 'Submitting...' : 'Submit Post'}</button>
               </form>
             </div>
           </Tabs.Content>
 
           <Tabs.Content value="view" className="outline-none animate-in fade-in slide-in-from-bottom-5 duration-500">
-            <div className="mb-10"><div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                {TOPICS.map(t => (<button key={t} onClick={() => setFilter(t)} className={`py-2.5 px-4 rounded-xl text-[11px] font-black transition-all border-2 ${filter === t ? 'bg-[#2d1b69] border-[#2d1b69] text-white shadow-md' : 'bg-white border-white text-gray-500 hover:border-purple-100 shadow-sm'}`}>{t}</button>))}
-            </div></div>
+            <div className="mb-10">
+              <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest ml-1 mb-3 block">Filter by Domain</label>
+              <select 
+                value={filter} 
+                onChange={(e) => setFilter(e.target.value)}
+                className="w-full md:w-auto md:min-w-[250px] p-4 bg-white/70 backdrop-blur-md border-2 border-blue-200/60 rounded-xl text-sm font-bold transition-all focus:ring-2 focus:ring-blue-400/50 focus:border-blue-400 outline-none text-blue-900 shadow-md hover:border-blue-300"
+              >
+                {TOPICS.map(t => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
             <div className="space-y-6">
-              {doubts.map((d) => (
-                <div key={d.id} className="p-6 md:p-8 bg-white/80 backdrop-blur-sm border border-white rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300">
-                  <div className="flex items-start justify-between mb-6">
-                    <span className="px-4 py-1 bg-gradient-to-r from-blue-50 to-purple-50 text-indigo-600 text-[10px] font-black uppercase rounded-full border border-indigo-100">{d.topic}</span>
-                    <span className="text-[10px] font-bold text-gray-300 tabular-nums">{new Date(d.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              {doubts.map((d, i) => (
+                <div key={d.id} className="p-6 md:p-8 bg-white/70 backdrop-blur-lg border border-blue-200/50 rounded-[2rem] shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 relative overflow-hidden group" style={{ animationDelay: `${i * 100}ms` }}>
+                  {/* Decorative hover effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400/0 via-blue-400/5 to-blue-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <div className="absolute top-2 right-2 w-12 h-12 border border-blue-300/20 rounded-full animate-ping opacity-0 group-hover:opacity-100" style={{ animationDuration: '2s' }}></div>
+                  
+                  <div className="flex items-start justify-between mb-6 relative z-10">
+                    <span className="px-4 py-1 bg-gradient-to-r from-blue-100/70 to-cyan-100/70 text-blue-700 text-[10px] font-black uppercase rounded-full border border-blue-200/60 shadow-sm">{d.topic}</span>
+                    <span className="text-[10px] font-bold text-blue-500 tabular-nums">{new Date(d.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                   </div>
-                  <p className="text-[#2d1b69] text-lg font-medium leading-relaxed">{d.question}</p>
-                  <div className="mt-6 pt-6 border-t border-gray-50 text-[10px] font-black text-gray-300 uppercase tracking-tighter italic">Anonymous Contributor</div>
+                  <p className="text-blue-900 text-lg font-medium leading-relaxed relative z-10">{d.question}</p>
+                  <div className="mt-6 pt-6 border-t border-blue-100/60 text-[10px] font-black text-blue-400 uppercase tracking-tighter italic relative z-10">Anonymous Contributor</div>
                 </div>
               ))}
-              {doubts.length === 0 && (<div className="py-24 text-center bg-white/40 rounded-[3rem] border-2 border-dashed border-purple-200 text-purple-400">No doubts found for {filter}.</div>)}
+              {doubts.length === 0 && (
+                <div className="py-24 text-center bg-white/50 backdrop-blur rounded-[3rem] border-2 border-dashed border-blue-300/60 text-blue-400 relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                    <div className="w-32 h-32 border-4 border-blue-400 rounded-full animate-ping" style={{ animationDuration: '3s' }}></div>
+                  </div>
+                  <span className="relative z-10">No doubts found for {filter}.</span>
+                </div>
+              )}
             </div>
           </Tabs.Content>
         </Tabs.Root>
 
-        <footer className="mt-24 pb-12 text-center opacity-40">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#2d1b69]">µLearn ASI • 2026</p>
+        <footer className="mt-24 pb-12 text-center opacity-50 relative">
+          <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-16 h-16 border border-blue-300/20 rounded-full animate-ping" style={{ animationDuration: '4s' }}></div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-600">µLearn ASI • 2026</p>
         </footer>
       </div>
     </div>
