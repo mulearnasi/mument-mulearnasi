@@ -191,7 +191,7 @@ export default function MuLearnQueryHub() {
                     disabled={loading || !newDoubt.topic} 
                     className="w-full py-5 bg-blue-600 text-white rounded-[1.5rem] font-black text-xl hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-4 disabled:opacity-50 tracking-tight"
                   >
-                    {loading ? 'Posting...' : 'Post Anonymously'}
+                    {loading ? 'Posting...' : 'Post '}
                   </button>
                 </div>
               </form>
