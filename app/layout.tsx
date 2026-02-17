@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "µLearn ASI",
   description: "Developed by µLearn Tech Team",
+  icons: {
+    icon: "/Mulearn.png", // Path to your file in the public folder
+    shortcut: "/Mulearn.png",
+    apple: "/Mulearn.png",
+  },
 };
 
 export default function RootLayout({

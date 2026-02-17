@@ -112,7 +112,7 @@ export default function MuLearnQueryHub() {
 
         <header className="mb-12 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 text-[11px] font-black tracking-[0.2em] text-purple-600 uppercase bg-white border border-purple-100 rounded-full shadow-sm">
-            µLearn ASI Movement
+            µLearn ASI 
           </div>
           <h1 className="text-5xl md:text-6xl font-black text-[#2d1b69] tracking-tight mb-4 leading-tight">
             Query <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">Hub</span>
